@@ -37,7 +37,7 @@ linters:
     - goconst
     - gocritic
     - gocyclo
-    - godot
+    # - godot
     - godox
     - gofmt
     - gofumpt
@@ -74,7 +74,7 @@ linters:
     - nolintlint
     - nonamedreturns
     - nosprintfhostport
-    - paralleltest
+    # - paralleltest # using parallel tests can introduce a lot of concurrency issues. Add it when you can, but this should not be enforced.
     - perfsprint
     - prealloc
     - predeclared
@@ -153,6 +153,39 @@ linters-settings:
     ignore-comments: true
 
   varnamelen:
+    # The longest distance, in source lines, that is being considered a "small scope".
+    # Variables used in at most this many lines will be ignored.
+    # Default: 5
+    max-distance: 5
+    # The minimum length of a variable's name that is considered "long".
+    # Variable names that are at least this long will be ignored.
+    # Default: 3
+    min-name-length: 3
+    # Check method receivers.
+    # Default: false
+    check-receiver: false
+    # Check named return values.
+    # Default: false
+    check-return: false
+    # Check type parameters.
+    # Default: false
+    check-type-param: false
+    # Ignore "ok" variables that hold the bool return value of a type assertion.
+    # Default: false
+    ignore-type-assert-ok: true
+    # Ignore "ok" variables that hold the bool return value of a map index.
+    # Default: false
+    ignore-map-index-ok: true
+    # Ignore "ok" variables that hold the bool return value of a channel receive.
+    # Default: false
+    ignore-chan-recv-ok: true
+    # Optional list of variable names that should be ignored completely.
+    # Default: []
+    ignore-names:
+      - err
+      - tc
+      - k
+      - v
     # Optional list of variable declarations that should be ignored completely.
     # Entries must be in one of the following forms (see below for examples):
     # - for variables, parameters, named return values, method receivers, or type parameters:
@@ -161,14 +194,21 @@ linters-settings:
     #
     # Default: []
     ignore-decls:
-      - c echo.Context
+      - ctx echo.Context
       - t testing.T
       - f *foo.Bar
-      - e error
       - i int
       - const C
       - T any
       - m map[string]int
+      - w io.Writer
+      - w http.ResponseWriter
+      - r *http.Request
+      - ok bool
+      - wg sync.WaitGroup
+      - wg *sync.WaitGroup
+      - wg *errgroup.Group
+      - wg errgroup.Group
 
   nlreturn:
     # Size of the block (including return statement that is still "OK")
@@ -208,3 +248,64 @@ linters-settings:
     # Tab width in spaces.
     # Default: 1
     tab-width: 4
+
+  wsl:
+    # Do strict checking when assigning from append (x = append(x, y)).
+    # If this is set to true - the append call must append either a variable
+    # assigned, called or used on the line above.
+    # https://github.com/bombsimon/wsl/blob/master/doc/configuration.md#strict-append
+    # Default: true
+    strict-append: true
+    # Allows assignments to be cuddled with variables used in calls on
+    # line above and calls to be cuddled with assignments of variables
+    # used in call on line above.
+    # https://github.com/bombsimon/wsl/blob/master/doc/configuration.md#allow-assign-and-call
+    # Default: true
+    allow-assign-and-call: true
+    # Allows assignments to be cuddled with anything.
+    # https://github.com/bombsimon/wsl/blob/master/doc/configuration.md#allow-assign-and-anything
+    # Default: false
+    allow-assign-and-anything: false
+    # Allows cuddling to assignments even if they span over multiple lines.
+    # https://github.com/bombsimon/wsl/blob/master/doc/configuration.md#allow-multiline-assign
+    # Default: true
+    allow-multiline-assign: true
+    # If the number of lines in a case block is equal to or lager than this number,
+    # the case *must* end white a newline.
+    # https://github.com/bombsimon/wsl/blob/master/doc/configuration.md#force-case-trailing-whitespace
+    # Default: 0
+    force-case-trailing-whitespace: 3
+    # Allow blocks to end with comments.
+    # https://github.com/bombsimon/wsl/blob/master/doc/configuration.md#allow-trailing-comment
+    # Default: false
+    allow-trailing-comment: false
+    # Allow multiple comments in the beginning of a block separated with newline.
+    # https://github.com/bombsimon/wsl/blob/master/doc/configuration.md#allow-separated-leading-comment
+    # Default: false
+    allow-separated-leading-comment: false
+    # Allow multiple var/declaration statements to be cuddled.
+    # https://github.com/bombsimon/wsl/blob/master/doc/configuration.md#allow-cuddle-declarations
+    # Default: false
+    allow-cuddle-declarations: false
+    # A list of call idents that everything can be cuddled with.
+    # Defaults: [ "Lock", "RLock" ]
+    allow-cuddle-with-calls: [ "Lock", "RLock" ]
+    # AllowCuddleWithRHS is a list of right hand side variables that is allowed
+    # to be cuddled with anything.
+    # Defaults: [ "Unlock", "RUnlock" ]
+    allow-cuddle-with-rhs: [ "Unlock", "RUnlock" ]
+    # Causes an error when an If statement that checks an error variable doesn't
+    # cuddle with the assignment of that variable.
+    # https://github.com/bombsimon/wsl/blob/master/doc/configuration.md#force-err-cuddling
+    # Default: false
+    force-err-cuddling: false
+    # When force-err-cuddling is enabled this is a list of names
+    # used for error variables to check for in the conditional.
+    # Default: [ "err" ]
+    error-variable-names: [ "err" ]
+    # Causes an error if a short declaration (:=) cuddles with anything other than
+    # another short declaration.
+    # This logic overrides force-err-cuddling among others.
+    # https://github.com/bombsimon/wsl/blob/master/doc/configuration.md#force-short-decl-cuddling
+    # Default: false
+    force-short-decl-cuddling: false
